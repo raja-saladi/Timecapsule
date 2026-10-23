@@ -1,0 +1,9 @@
+import { redirect,notFound } from "next/navigation";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+import { AppHeader } from "@/components/app-header";
+import { CapsuleForm } from "@/components/capsule-form";
+import { createClient } from "@/lib/supabase/server";
+import type { Capsule,CapsuleContent,CapsuleMedia } from "@/lib/types";
+import { currentTime } from "@/lib/capsules";
+export default async function EditCapsulePage({params}:{params:Promise<{id:string}>}){const {id}=await params;const supabase=await createClient();if(!supabase)notFound();const {data:{user}}=await supabase.auth.getUser();if(!user)redirect("/auth");const found=await supabase.from("capsules").select("*").eq("id",id).eq("user_id",user.id).maybeSingle();if(!found.data)notFound();const capsule=found.data as Capsule;if(new Date(capsule.unlock_at).getTime()<=currentTime())notFound();const [letter,media,recipients]=await Promise.all([supabase.from("capsule_contents").select("capsule_id,letter").eq("capsule_id",id).maybeSingle(),supabase.from("capsule_media").select("id,capsule_id,storage_key,file_name,mime_type,size_bytes,created_at").eq("capsule_id",id),supabase.from("capsule_recipients").select("recipient_email").eq("capsule_id",id).limit(1).maybeSingle()]);return <div className="app-page"><AppHeader/><main className="shell app-main"><div className="form-shell"><Link href="/dashboard" className="btn btn-text" style={{paddingLeft:0}}><ArrowLeft size={14}/> Back to your capsules</Link><div className="page-heading" style={{marginTop:15}}><div><div className="eyebrow">Still yours to shape</div><h1>Edit capsule</h1><p>Changes are available until the capsule opens.</p></div></div></div><CapsuleForm capsule={capsule} content={letter.data as CapsuleContent|null} media={(media.data||[]) as CapsuleMedia[]} recipientEmail={recipients.data?.recipient_email}/></main></div>;}

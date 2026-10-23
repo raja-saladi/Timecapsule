@@ -1,0 +1,6 @@
+"use client";
+import dynamic from "next/dynamic";
+import { motion, useReducedMotion } from "framer-motion";
+import { Box, LockKeyhole, Clock3 } from "lucide-react";
+const CapsuleScene = dynamic(() => import("@/components/capsule-scene").then((mod) => mod.CapsuleScene), { ssr: false, loading: () => <div className="scene-fallback"><div className="fallback-capsule"/></div> });
+export function HeroExperience() { const reduced = useReducedMotion(); return <motion.div className="hero-visual" initial={reduced ? false : { opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .8, ease: "easeOut" }}><div className="hero-glow"/><div className="capsule-orbit"/><div className="scene-shell"><CapsuleScene/></div><div className="float-tag tag-one"><span className="tag-light"/>Sealed for later<strong>Still yours, always</strong></div><div className="float-tag tag-two"><Box size={12} style={{display:"inline",marginRight:6,color:"#65deff"}}/>A moment saved<strong>Oct 23, 2026</strong></div><div className="float-tag tag-three"><LockKeyhole size={12} style={{display:"inline",marginRight:6,color:"#ad96ff"}}/>Opens in<strong><Clock3 size={11} style={{display:"inline",marginRight:5}}/>1 year</strong></div></motion.div>; }
