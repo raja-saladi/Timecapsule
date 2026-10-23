@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: time-capsule-api
+    runtime: node
+    plan: free
+    buildCommand: corepack pnpm install --frozen-lockfile
+    startCommand: node backend/server.mjs
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: 24.21.0
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_PUBLISHABLE_KEY
+        sync: false
+      - key: FRONTEND_ORIGINS
+        sync: false
